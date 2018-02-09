@@ -97,7 +97,7 @@ public class WoordenController implements Initializable {
 
     @FXML
     private void concordatieAction(ActionEvent event) {
-        System.out.println(characterConcordance(taInput.getText()));
+        taOutput.setText(characterConcordance(taInput.getText()).toString());
     }
 
 
