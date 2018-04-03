@@ -6,16 +6,13 @@ package woordenapplicatie.gui;
  * and open the template in the editor.
  */
 
-
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import woordenapplicatie.util;
 
 /**
  * FXML Controller class
@@ -45,15 +42,7 @@ public class WoordenController implements Initializable {
             "Hoedje van papier";
 
     @FXML
-    private Button btAantal;
-    @FXML
     private TextArea taInput;
-    @FXML
-    private Button btSorteer;
-    @FXML
-    private Button btFrequentie;
-    @FXML
-    private Button btConcordantie;
     @FXML
     private TextArea taOutput;
 
@@ -63,67 +52,41 @@ public class WoordenController implements Initializable {
     }
 
     @FXML
-    private void aantalAction(ActionEvent event) {
-        ArrayList<String> list = stringToWordList(taInput.getText());
-
-        Set<String> unique = new HashSet<>(list);
-        HashSet noDupSet = new HashSet(list);
-
-        taOutput.setText("Totaal aantal " + noDupSet.size());
-        taOutput.appendText("\nTotaal aantal " + list.size());
+    private void aantalAction() {
+        taOutput.setText(null);
+        ArrayList<String> list = util.stringToWordList(taInput.getText());
+        taOutput.setText("Unique words: " + util.removeDuplicates(list).size());
+        taOutput.appendText("\nTotal words: " + list.size());
     }
 
     @FXML
-    private void sorteerAction(ActionEvent event) {
-        ArrayList<String> words = stringToWordList(taInput.getText());
-        Collections.sort(words, Collections.reverseOrder());
+    private void sorteerAction() {
+        taOutput.setText(null);
+        ArrayList<String> words = util.stringToWordList(taInput.getText());
+        words.sort(Collections.reverseOrder());
         for (String word : words) {
             taOutput.appendText(word + "\n");
         }
     }
 
     @FXML
-    private void frequentieAction(ActionEvent event) {
-        ArrayList<String> list = stringToWordList(taInput.getText());
+    private void frequentieAction() {
+        taOutput.setText(null);
+        taOutput.setText(util.getWordFrequency(taInput.getText()).toString());
+        Map<String, Integer> concordance = util.getWordFrequency(taInput.getText());
+        StringBuilder output = new StringBuilder();
 
-        taOutput.setText(btAantal.getText());
-        Set<String> unique = new HashSet<>(list);
-        String output = "";
-        for (String key : unique) {
-            output += key + ": " + Collections.frequency(list, key) + "\n";
+        for (Map.Entry<String, Integer> entry : concordance.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            output.append(key).append(": ").append(value).append("\n");
         }
-        taOutput.setText(output);
+        taOutput.setText(output.toString());
     }
 
     @FXML
-    private void concordatieAction(ActionEvent event) {
-        taOutput.setText(characterConcordance(taInput.getText()).toString());
-    }
-
-
-    private ArrayList<String> stringToWordList(String _taInput) {
-        ArrayList<String> wordArrayList = new ArrayList<>();
-        wordArrayList.addAll(Arrays.asList(_taInput.split("\\s*(=>|,|\\s)\\s*")));
-        return wordArrayList;
-    }
-
-    private static Map<Character, Set<Integer>> characterConcordance(final String input) {
-        Map<Character, Set<Integer>> concordance = new HashMap<>();
-
-        for (int i = 0; i < input.length(); i++) {
-            char charAt = input.charAt(i);
-            if (charAt == ' ') {
-                continue;
-            }
-            Set<Integer> set = concordance.get(charAt);
-            if (set == null) {
-                set = new HashSet<>();
-            }
-            set.add(i + 1);
-            concordance.put(charAt, set);
-        }
-
-        return concordance;
+    private void concordatieAction() {
+        taOutput.setText(util.wordConcordance(taInput.getText()).toString());
     }
 
 }
